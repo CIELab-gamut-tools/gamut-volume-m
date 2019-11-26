@@ -13,13 +13,13 @@ Min_L=min(min(Z(TRI(:,1),3),Z(TRI(:,2),3)),Z(TRI(:,3),3));
 
 delta_Hue=2*pi/hsteps;
 
-L=(0:100)';
+L=(0:100/Lsteps:100)';
 Hue=(0:delta_Hue:2*pi)';
 
 cylmap=cell(Lsteps,hsteps);
 
 %For every step in L*
-for p=2:size(L,1)-1
+for p=2:size(L,1)
     
     Lmid=(L(p)+L(p-1))/2;
     orig=[0 0 Lmid];
@@ -64,7 +64,7 @@ for p=2:size(L,1)-1
         ix= u>=0 & v>=0 & u+v<=1 & t>=0;
         %If no tile was found, add some tolerance and try again.
         if (sum(ix)==0)
-            ix= u>=-0.05 & v>=-0.05 & u+v<=1.05 & t>=0;
+            ix= u>=-0.001 & v>=-0.001& u+v<=1.001 & t>=0;
         end
         cylmap(p-1,q-1)={[sign(idet(ix)),t(ix)]};
     end                 
