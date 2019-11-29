@@ -1,4 +1,4 @@
-function [Lab] = XYZ2Lab(XYZ,XYZn)
+function [Lab] = xyz2lab(XYZ,XYZn)
 
 %create ratio matrix
 ratio = XYZ*diag(1./XYZn);
