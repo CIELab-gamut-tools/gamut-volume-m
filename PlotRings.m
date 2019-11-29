@@ -1,20 +1,95 @@
-function PlotRings(gamut, refgamut)
+function PlotRings(gamut, varargin)
 %GAMUTRINGS Plots a gamut rings figure from CIELab gamut data
 
-[x,y,~,vol] = calcRings(gamut);
+p = inputParser;
+validGamut = @(x) all(isfield(x,{'hsteps','Lsteps','title','cylmap'}));
+addRequired(p,'gamut',validGamut);
+addOptional(p,'ref',[],validGamut);
+addParameter(p,'ShowBands',true,@islogical);
+addParameter(p,'BandChroma',50,@isscalar);
+addParameter(p,'BandLScale',0.6,@isscalar);
+addParameter(p,'BandLCent',100,@isscalar);
+addParameter(p,'RingReference','none',@(x) any(validatestring(x,{'none','intersection','ref'},'PlotRings')));
+addParameter(p,'LLabelIndices',[1,5],@isnumeric);
+addParameter(p,'LLabelColors','default',@(x) strcmp(x,'default') || isnumeric(x));
+addParameter(p,'LRings',10:10:100,@isnumeric);
+addParameter(p,'ShowCentMark',true,@islogical);
+addParameter(p,'CentMarkSize',20,@isscalar);
+addParameter(p,'CentMark','+k',@ischar);
+addParameter(p,'RingLine','k',@ischar);
+addParameter(p,'RefLine','--k',@ischar);
+parse(p,gamut,varargin{:});
+
+refgamut = p.Results.ref;
+lrings = p.Results.LRings;
+
+[x,y,~,vol] = calcRings(gamut,lrings);
+
+clf;
 %plot the figure
-plot(x(10:10:end,[1:end 1])',y(10:10:end,[1:end 1])','k');
+if (~strcmp(p.Results.RingLine,''))
+    plot(x(:,[1:end 1])',y(:,[1:end 1])',p.Results.RingLine);
+else
+    box on;
+end
 hold on
+
+%add the ring references, if specified
+ringRef = validatestring(p.Results.RingReference,{'none','intersection','ref'});
+if ~strcmp(ringRef,'none')
+    if strcmp(ringRef,'intersection')
+        ringref = IntersectGamuts(gamut, refgamut);
+    else
+        ringref = refgamut;
+    end
+    [xi,yi]=calcRings(ringref,lrings);
+    ri=xi.^2+yi.^2;
+    rg=x.^2+y.^2;
+    rsc=min(1,sqrt((ri(2:end,:)-ri(1:end-1,:)+rg(1:end-1,:))./rg(2:end,:)));
+    xd=x(2:end,:).*rsc;
+    yd=y(2:end,:).*rsc;
+    plot(xd(:,[1:end 1])',yd(:,[1:end 1])',p.Results.RefLine);
+end
+
+%add the coloured bands, if specified
+if (p.Results.ShowBands)
+    %fill in the colours
+    chroma=p.Results.BandChroma;
+    cscale=p.Results.BandLScale;
+    ccent=p.Results.BandLCent;
+    r=max(1,sqrt(x.^2+y.^2));
+    lim=size(x,2)*2;
+    TRI=[1:lim; 2:lim 1; 3:lim 1:2]'; 
+    for n=1:size(x,1)-1
+        xc=reshape(x(n:n+1,:),[],1);
+        yc=reshape(y(n:n+1,:),[],1);
+        rc=reshape(r(n:n+1,:),[],1);
+        rgb=lab2srgb([(lrings(n)-ccent)*cscale+ccent+rc*0, chroma*xc./rc, chroma*yc./rc])/255;
+        trisurf(TRI,xc,yc,zeros(lim,1)-1,...
+            'EdgeColor','none',...
+            'FaceVertexCData',rgb,...
+            'FaceColor','interp');
+    end
+end
+
 %add labels for L* 10, 50 and 100
-for n=[10 50 100]
-    text(x(n,floor(end*15/16)),y(n,floor(end*15/16)),sprintf('L*=%d',n),'Color',[0.5,0.3,0]);
+for n=1:numel(p.Results.LLabelIndices)
+    if strcmp(p.Results.LLabelColors,'default')
+        cols=(p.Results.LLabelIndices(:)<numel(lrings))*[1,1,1];
+    else
+        cols=ones(numel(p.Results.LLabelIndices),1)*p.Results.LLabelColors;
+    end
+    i=p.Results.LLabelIndices(n);
+    text(x(i+1,floor(end*15/16)),y(i+1,floor(end*15/16)),sprintf('L*=%d',lrings(n)),'Color',cols(n,:),'FontWeight','demi');
 end
 %add a central marker
-plot(0,0,'+','MarkerSize',20);
+if p.Results.ShowCentMark
+    plot(0,0,p.Results.CentMark,'MarkerSize',p.Results.CentMarkSize);
+end
 %if a reference is supplied, add a dotted outline
-if nargin>1
-    [x,y] = calcRings(refgamut);
-    plot(x(end,[1:end 1]),y(end,[1:end 1]),'--k');
+if ~isempty(refgamut)
+    [x,y] = calcRings(refgamut,lrings);
+    plot(x(end,[1:end 1]),y(end,[1:end 1]),p.Results.RefLine);
 end
 %add a little padding to the axis range
 axis(axis*1.05);
@@ -29,17 +104,18 @@ ylabel('b^*_{RSS}')
 hold off;
 end
 
-function [x,y,rings,vol]=calcRings(gamut)
+function [x,y,rings,vol]=calcRings(gamut,LRings)
     dH=2*pi/gamut.hsteps;
     dL=100/gamut.Lsteps;
     %get the map of the volume in cylintrical coordinates
     volmap=cellfun(@(a) sum(a(:,1).*(a(:,2).^2)*dL*dH/2),gamut.cylmap);
     %Get the accumulated volume sum (the final row will be the total)
     %and calculate the radius required to represent that volume
-    rings=(2*cumsum(volmap)/dH).^0.5;
+    %adding a zero radius at the start
+    rings=interp1([0 1:100/gamut.Lsteps:100],[zeros(1,gamut.hsteps);(2*cumsum(volmap)/dH).^0.5],[0 LRings]);
     %Plot against the mid-point of the angle ranges
     midH=dH/2:dH:2*pi;
-    x=repmat(sin(midH),gamut.Lsteps,1).*rings;
-    y=repmat(cos(midH),gamut.Lsteps,1).*rings;
+    x=repmat(sin(midH),numel(LRings)+1,1).*rings;
+    y=repmat(cos(midH),numel(LRings)+1,1).*rings;
     vol=sum(volmap(:));
 end
