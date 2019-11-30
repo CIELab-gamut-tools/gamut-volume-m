@@ -7,8 +7,7 @@ addRequired(p,'gamut',validGamut);
 addOptional(p,'ref',[],validGamut);
 addParameter(p,'ShowBands',true,@islogical);
 addParameter(p,'BandChroma',50,@isscalar);
-addParameter(p,'BandLScale',0.6,@isscalar);
-addParameter(p,'BandLCent',100,@isscalar);
+addParameter(p,'BandLs',20:70/9:90,@isnumeric);
 addParameter(p,'RingReference','none',@(x) any(validatestring(x,{'none','intersection','ref'},'PlotRings')));
 addParameter(p,'LLabelIndices',[1,5],@isnumeric);
 addParameter(p,'LLabelColors','default',@(x) strcmp(x,'default') || isnumeric(x));
@@ -18,6 +17,8 @@ addParameter(p,'CentMarkSize',20,@isscalar);
 addParameter(p,'CentMark','+k',@ischar);
 addParameter(p,'RingLine','k',@ischar);
 addParameter(p,'RefLine','--k',@ischar);
+addParameter(p,'ChromaRing',1000,@isnumeric);
+addParameter(p,'ShowPrimaries',true,@islogical);
 parse(p,gamut,varargin{:});
 
 refgamut = p.Results.ref;
@@ -55,8 +56,7 @@ end
 if (p.Results.ShowBands)
     %fill in the colours
     chroma=p.Results.BandChroma;
-    cscale=p.Results.BandLScale;
-    ccent=p.Results.BandLCent;
+    ls=p.Results.BandLs;
     r=max(1,sqrt(x.^2+y.^2));
     lim=size(x,2)*2;
     TRI=[1:lim; 2:lim 1; 3:lim 1:2]'; 
@@ -64,7 +64,7 @@ if (p.Results.ShowBands)
         xc=reshape(x(n:n+1,:),[],1);
         yc=reshape(y(n:n+1,:),[],1);
         rc=reshape(r(n:n+1,:),[],1);
-        rgb=lab2srgb([(lrings(n)-ccent)*cscale+ccent+rc*0, chroma*xc./rc, chroma*yc./rc])/255;
+        rgb=lab2srgb([ls(n)+rc*0, chroma*xc./rc, chroma*yc./rc])/255;
         trisurf(TRI,xc,yc,zeros(lim,1)-1,...
             'EdgeColor','none',...
             'FaceVertexCData',rgb,...
@@ -80,7 +80,7 @@ for n=1:numel(p.Results.LLabelIndices)
         cols=ones(numel(p.Results.LLabelIndices),1)*p.Results.LLabelColors;
     end
     i=p.Results.LLabelIndices(n);
-    text(x(i+1,floor(end*15/16)),y(i+1,floor(end*15/16)),sprintf('L*=%d',lrings(n)),'Color',cols(n,:),'FontWeight','demi');
+    text(x(i+1,floor(end*15/16)),y(i+1,floor(end*15/16)),sprintf('L*=%d',lrings(i)),'Color',cols(n,:),'FontWeight','demi');
 end
 %add a central marker
 if p.Results.ShowCentMark
@@ -88,9 +88,49 @@ if p.Results.ShowCentMark
 end
 %if a reference is supplied, add a dotted outline
 if ~isempty(refgamut)
-    [x,y] = calcRings(refgamut,lrings);
-    plot(x(end,[1:end 1]),y(end,[1:end 1]),p.Results.RefLine);
+    [xref,yref] = calcRings(refgamut,lrings);
+    plot(xref(end,[1:end 1]),yref(end,[1:end 1]),p.Results.RefLine);
 end
+if (p.Results.ChromaRing>0)
+    r=p.Results.ChromaRing;
+    plot(r*sin(0:pi/200:2*pi),r*cos(0:pi/200:2*pi),'Color',[0.7,0.7,0.7]);
+end
+if (p.Results.ShowPrimaries)
+    %get the Lab colours of the primaries
+    prims=[1,0,0;1,1,0;0,1,0;0,1,1;0,0,1;1,0,1]*gamut.RGBmax;
+    r=p.Results.ChromaRing;
+    for n=1:6
+        rgb=prims(n,:);
+        if (~isempty(refgamut))
+            ri=find(all(refgamut.RGB==rgb,2),1);
+            if (~isempty(ri))
+                rlab=refgamut.CIELAB(ri,:);
+                rcol=lab2srgb(rlab)/255;
+                rpt=rlab(2:3)*r/norm(rlab(2:3));
+                mpt=rpt*0.9;
+                rhue=mod(fix(atan2(rlab(2),rlab(3))/pi*180)+719,360)+1;
+                plot([xref(end,rhue),mpt(1)],[yref(end,rhue),mpt(2)],'Color',[0.7,0.7,0.7]);
+                rvect=[rpt(1)-mpt(1),rpt(2)-mpt(2)];
+                quiver(mpt(1),mpt(2),rvect(1),rvect(2),'Color',rcol,'LineWidth',1.5,'MaxHeadSize',200/norm(rvect),'AutoScale','off');
+            end                
+        end
+        i=find(all(gamut.RGB==rgb,2),1);
+        if (~isempty(i))
+            lab=gamut.CIELAB(i,:);
+            col=lab2srgb(lab)/255;
+            pt=lab(2:3)*r*.95/norm(lab(2:3));
+            hue=mod(fix(atan2(lab(2),lab(3))/pi*180)+719,360)+1;
+            vect=[pt(1)-x(end,hue),pt(2)-y(end,hue)];
+            quiver(x(end,hue),y(end,hue),vect(1),vect(2),'Color',col,'LineWidth',1.5,'MaxHeadSize',200/norm(vect),'AutoScale','off');
+        end
+        if (~(isempty(refgamut) || isempty(ri) || isempty(i)))
+            rng=(hue:sign(rhue-hue):rhue)/180*pi;
+            plot(0.95*r*sin(rng),0.95*r*cos(rng),':k');
+        end
+    end
+end
+
+
 %add a little padding to the axis range
 axis(axis*1.05);
 %make the axes equal
