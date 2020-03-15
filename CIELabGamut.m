@@ -13,6 +13,8 @@ function gamut = CIELabGamut(varargin)
 %
 % see also GetVolume, IntersectGamuts, PlotVolume, PlotRings
 
+%import all of the functions in the +CIEtools folder
+import CIEtools.*
 % deal with the different input argument variants
 if nargin < 3
     if nargin == 0
