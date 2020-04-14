@@ -16,6 +16,11 @@ git clone git@github.com:CIELab-gamut-tools/gamut-volume-m.git
 ### Without using `git`
 Download the zip file with the project from [here](https://github.com/CIELab-gamut-tools/gamut-volume-m/archive/master.zip)
 and unzip it into a suitable folder.  You may want to rename the unzipped folder from `gamut-volume-m-master` to `gamut-volume-m` to be consistant with the `git` instructions above. 
+## Testing
+To run all unit tests (contained in the `+tests` package folder), from matlab
+```matlab
+runtests('tests');
+```
 ## Use
 ### `CIELabGamut`
 The `CIELabGamut` function creates a gamut data structure from either supplied matrix data or from a CGATS data file.
