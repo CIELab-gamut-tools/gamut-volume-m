@@ -1,6 +1,6 @@
 function gamut = CIELabGamut(varargin)
 %CIELabGamut Build a representation of a CIELab gamut
-%   gamut = CIELabGamut(RGB,XYZ,title,type) build a gamut from supplied data
+%   gamut = CIELabGamut(RGB,XYZ,title) build a gamut from supplied data
 %     RGB is a matrix of RGB triplets arranged in rows
 %     XYZ is a matrix of XYZ triplets arranged in rows
 %     title is the title of the data to me used for plot titles etc
@@ -31,6 +31,7 @@ if nargin < 3
         [filename,path] = uigetfile(fullfile(varargin{:}),'Please select a CGATS gamut data file');
     end
     gamut=readCGATS(fullfile(path,filename));
+    gamut.title=filename;
 else
     gamut=[];
     gamut.RGB=varargin{1};
@@ -64,7 +65,7 @@ end
 gamut.TRI=map(TRI_ref);
 
 %Convert to CIE 1971 L*a*b* (CIELAB) color space
-gamut.CIELAB=xyz2lab(gamut.XYZ,D50);
+gamut.LAB=xyz2lab(gamut.XYZ,D50);
 %finally calculate the surface intersections of L* rays
 %use 100 L* steps and 360 hue steps
 gamut.Lsteps=100;
