@@ -309,7 +309,7 @@ for n=1:max(nprims,nrefprims)
         %if it exists
         if (~isempty(ri))
             %get the Lab values
-            rlab=refgamut.CIELAB(ri,:);
+            rlab=refgamut.LAB(ri,:);
             %calculate the nearest sRGB colour
             rcol=lab2srgb(rlab)/255;
             %calculate the end of the arrow
@@ -342,7 +342,7 @@ for n=1:max(nprims,nrefprims)
         %if it exists
         if (~isempty(i))
             %get the Lab value
-            lab=gamut.CIELAB(i,:);
+            lab=gamut.LAB(i,:);
             %calculate the nearest sRGB colour
             col=lab2srgb(lab)/255;
             %calculate the end of the arrow

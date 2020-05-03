@@ -17,7 +17,7 @@ git clone git@github.com:CIELab-gamut-tools/gamut-volume-m.git
 Download the zip file with the project from [here](https://github.com/CIELab-gamut-tools/gamut-volume-m/archive/master.zip)
 and unzip it into a suitable folder.  You may want to rename the unzipped folder from `gamut-volume-m-master` to `gamut-volume-m` to be consistant with the `git` instructions above. 
 ## Testing
-To run all unit tests (contained in the `+tests` package folder), from matlab
+To run all unit tests (contained in the `+tests` package folder), navigate to the project folder from within matlab, then:
 ```matlab
 runtests('tests');
 ```
