@@ -1,18 +1,48 @@
 function gamut = CIELabGamut(varargin)
-%CIELabGamut Build a representation of a CIELab gamut
-%   gamut = CIELabGamut(RGB,XYZ,title,type) build a gamut from supplied data
-%     RGB is a matrix of RGB triplets arranged in rows
-%     XYZ is a matrix of XYZ triplets arranged in rows
-%     title is the title of the data to me used for plot titles etc
+% CIELabGamut Build a representation of a CIELab gamut
 %
-%   gamut = CIELabGamut(filename) build a gamut from an ASCII CGATS.17 file
+% Syntax:
+%   gamut = CIELabGamut();
+%   gamut = CIELabGamut(filename);
+%   gamut = CIELabGamut(filepath);
+%   gamut = CIELabGamut(filepath, filter);
+%   gamut = CIELabGamut(RGB,XYZ,title);
 %
-%   gamut = CIELabGamut(filepath, filter) browse for a file from the supplied path
+% Input Arguments:
+%   If no arguments are given, the user can browse for a suitable ASCII
+%     CGATS.17 file, containing measurement RGB signal levels and
+%     measured XYZ data, from which the gamut will be loaded.
 %
-%   gamut = CIELabGamut() browser for a file from the current path
+%   filename specifies the file to be loaded.
 %
-% see also GetVolume, IntersectGamuts, PlotVolume, PlotRings
+%   filepath specifies the path from which a file can be selected.
+%
+%   filter is the file pattern to be used in selecting files.
+%
+%   RGB is a matrix of RGB triplets arranged in rows.
+%
+%   XYZ is a matrix of XYZ triplets arranged in rows.
+%
+%   title is the title of the data to be used for plot titles etc.
+%
+% Returned Values:
+%  gamut is a structure containing the gamut data which can be used by any
+%  of the other analysis functions, such as GetVolume or PlotRings.
+%
+% Examples:
+%  % Browse for a file
+%  gamut = CIELabGamut();
+%  % Browse for a file from a particular location
+%  gamut = CIELabGamut('/path/to/folder','*.cgats');
+%  % Load data from a particular file
+%  gamut = CIELabGamut('sRGB.txt');
+%  % Initialise data from supplied matrices
+%  gamut = CIELabGamut(RGB, XYZ, 'simulated gamut');    
+%
+% see also GetVolume, IntersectGamuts, PlotVolume, PlotRings, SyntheticGamut
 
+%import all of the functions in the +CIEtools folder
+import CIEtools.*
 % deal with the different input argument variants
 if nargin < 3
     if nargin == 0
@@ -29,6 +59,7 @@ if nargin < 3
         [filename,path] = uigetfile(fullfile(varargin{:}),'Please select a CGATS gamut data file');
     end
     gamut=readCGATS(fullfile(path,filename));
+    gamut.title=filename;
 else
     gamut=[];
     gamut.RGB=varargin{1};
@@ -62,7 +93,7 @@ end
 gamut.TRI=map(TRI_ref);
 
 %Convert to CIE 1971 L*a*b* (CIELAB) color space
-gamut.CIELAB=xyz2lab(gamut.XYZ,D50);
+gamut.LAB=xyz2lab(gamut.XYZ,D50);
 %finally calculate the surface intersections of L* rays
 %use 100 L* steps and 360 hue steps
 gamut.Lsteps=100;

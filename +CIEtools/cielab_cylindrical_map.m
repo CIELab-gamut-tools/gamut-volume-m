@@ -1,9 +1,9 @@
 function cylmap = cielab_cylindrical_map(gamut)
 TRI = gamut.TRI;
-CIELAB = gamut.CIELAB;
+LAB = gamut.LAB;
 Lsteps = gamut.Lsteps;
 hsteps = gamut.hsteps;
-Z=[CIELAB(:,2) CIELAB(:,3) CIELAB(:,1)];
+Z=LAB(:,[2 3 1]);
 %Find the minmum and maxmum L* in each triangle
 
 Max_L=max(max(Z(TRI(:,1),3),Z(TRI(:,2),3)),Z(TRI(:,3),3));

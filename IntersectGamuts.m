@@ -1,6 +1,28 @@
 function [gamut] = IntersectGamuts(g1,g2)
-%GAMUTINTERSECT intersects two gamuts producing a new gamut
-%   gamut = IntersectGamuts(gamut1, gamut2)
+% IntersectGamuts intersects two gamuts producing a new gamut
+%
+% Syntax:
+%   gamut = IntersectGamuts(gamut1, gamut2);
+%
+% Input arguments:
+%   gamut, refGamut etc are all gamut objects returned by one of
+%   CIELabGamut, IntersectGamuts or SyntheticGamut.
+%
+% Returned values:
+%   gamut is a gamut object which can be used by PlotRings, GetVolume and
+%   futher calls to this function, however this gamut does not include a
+%   surface tesselation so it cannot be used with PlotVolume
+%
+% Examples:
+%   % Load test and reference gamut data
+%   gamut = CIELabGamut('experimental.txt');
+%   ref = CIELabGamut('sRGB.txt');
+%   % calculate the intersection
+%   igamut = IntersectGamuts(gamut,ref);
+%   % display the intersected gamut volume
+%   fprints('sRGB gamut volume = %g\n',GetVolume(igamut));
+%
+% See also CIELabGamut, PlotRings, GetVolume, SyntheticGamut
 
 if (g1.Lsteps~=g2.Lsteps || g1.hsteps~=g2.hsteps)
     error('The gamut cylindrical mappings must match');
