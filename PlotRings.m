@@ -1,6 +1,5 @@
 function PlotRings(gamut, varargin)
-% PlotRings 
-% Plot a Gamut Rings figure from CIELab gamut data
+% PlotRings Plot a Gamut Rings figure from CIELab gamut data
 %
 % Syntax:
 %   PlotRings(gamut);
@@ -9,8 +8,8 @@ function PlotRings(gamut, varargin)
 %   PlotRings(___, 'parameter', value, ...);
 %
 % Input Arguments:
-%   gamut, refGamut etc are all gamut objects returned by one of CIELabGamut
-%   or IntersectGamuts.
+%   gamut, refGamut etc are all gamut objects returned by one of
+%   CIELabGamut, IntersectGamuts or SyntheticGamut.
 %
 % Examples:
 %   % A simple rings plot with a reference
@@ -115,7 +114,7 @@ function PlotRings(gamut, varargin)
 %   PrimaryOrigin     - From where the ref primary arrows will be drawn.
 %                     - ['ring' (default) | 'centre' | 'center']
 %
-% See also CIELabGamut, PlotVolume, GetVolume, IntersectGamuts
+% See also CIELabGamut, PlotVolume, GetVolume, IntersectGamuts, SyntheticGamut
 %
 % https://github.com/CIELab-gamut-tools/gamut-volume-m
 

@@ -13,13 +13,16 @@ function [gamut] = SyntheticGamut(varargin)
 %
 % Input Arguments:
 %   referenceName is a string or char array, and one of 'sRGB', 'DCI-P3',
-%   'BT.2020'.
+%     'BT.2020'.
+%
 %   RGBxy is a 3x2 matrix of CIE1931 x,y chromaticities in the row order
 %     red, green then blue.
+%
 %   white is either a 2-element row vector and specifies the CIE1931 x,y 
 %     chromaticity coordinates for the white point, or is a string or char
 %     array specifying the white point and will be one of 'D50', 'D60',
 %     'D65' or 'DCI-P3'.
+%
 %   driveMapping is a function which maps a set of linear rgb signal levels
 %     to drive levels for the supplied colorants.  For the case where RGB
 %     chromaticities have been supplied, the fourth colorant is a white, so
@@ -29,6 +32,7 @@ function [gamut] = SyntheticGamut(varargin)
 %     the required N signal levels. The function will be called with an Mx3
 %     matrix of nominal drive signals and should return an MxN matrix of
 %     drive signals to be used on the N display colorants.
+%
 %   colorantXYZ is an Nx3 matrix of CIE1931 X,Y,Z tristimulous values for
 %     each colorant in the simulated display.  This must be supplied where
 %     more than the standard three primary RGB colorants, plus white, are
@@ -41,7 +45,7 @@ function [gamut] = SyntheticGamut(varargin)
 % Examples:
 %   % Compare the gamut volumes of BT2020 and sRGB
 %   sRGBvol = GetVolume(SyntheticGamut('sRGB'));
-%   BT2020vol = GetVolume(SyntheticGamut('BT2020'));
+%   BT2020vol = GetVolume(SyntheticGamut('BT.2020'));
 %   r = BT2020vol/sRGBvol;
 %   sprintf('The BT2020 gamut volume is %gx that of sRGB\n', r);
 %
