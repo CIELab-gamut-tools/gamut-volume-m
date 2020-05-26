@@ -11,7 +11,7 @@ Other git clients are also available if preferred, a full list can be found [her
 ### Using `git`
 From a suitable containing folder:
 ```bash
-git clone git@github.com:CIELab-gamut-tools/gamut-volume-m.git
+git clone https://github.com/CIELab-gamut-tools/gamut-volume-m.git
 ```
 ### Without using `git`
 Download the zip file with the project from [here](https://github.com/CIELab-gamut-tools/gamut-volume-m/archive/master.zip)
