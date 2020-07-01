@@ -1,0 +1,18 @@
+To cite gamut-volume-m in publication, please use:
+
+Euan Smith, Rodney L. Heckaman, Karl Lang, John Penczek, Johan Bergquist, 
+Measuring the color capability of modern display systems, Journal of the
+Society for Information Display, Volume 28, Issue 6, June 2020, 548-556.
+https://doi.org/10.1002/jsid.918
+
+A BibTeX entry for LaTeX users is
+
+@article{,
+   author={Smith E., Heckaman R. L., Lang K., Penczek J., Bergquist J},
+   title={Measuring the color capability of modern display systems},
+   journal={Journal of the Society for Information Display},
+   volume={28},
+   issue={6},
+   year=2020,
+   pages={548-556}
+}
