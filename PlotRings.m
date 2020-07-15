@@ -302,7 +302,7 @@ for n=1:max(nprims,nrefprims)
     ri=[];
     i=[];
     %reference primaries first.
-    if (n<=nrefprims)
+    if (n<=nrefprims && ~(isempty(refgamut)))
         %find the specified primary
         ri=find(all(refgamut.RGB==prims(n,:)*refgamut.RGBmax,2),1);
         %if it exists
@@ -335,7 +335,7 @@ for n=1:max(nprims,nrefprims)
         end                        
     end
     %now do the gamut primary
-    if (n<=nprims && ~(isempty(refgamut)))
+    if (n<=nprims)
         %find the primary
         i=find(all(gamut.RGB==prims(n,:)*gamut.RGBmax,2),1);
         %if it exists
