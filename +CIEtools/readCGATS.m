@@ -10,7 +10,7 @@ function cgats = readCGATS(filename)
 %open and read all lines of the file to a cell array
 f = fopen(filename);
 s = textscan(f,'%s','Delimiter','\n');
-s = s{1};
+s = cellfun(@strtrim,s{1},'UniformOutput',false);
 fclose(f);
 
 %check the version number - must be in the first line of the file.
