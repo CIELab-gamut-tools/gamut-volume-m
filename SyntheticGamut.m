@@ -97,20 +97,17 @@ function [gamut] = SyntheticGamut(varargin)
 % See also CIELabGamut, PlotVolume, GetVolume, IntersectGamuts, PlotRings
 %
 % https://github.com/CIELab-gamut-tools/gamut-volume-m
-    
-    import CIEtools.*
+    try
+        import CIEtools.*;
+    catch
+        octimport CIEtools;
+    end
 
     %=====================================
     % Define the standard reference gamuts
-    
-    function d=sRGBgamma(v)
-        d=25*v/323;
-        sel=v>0.04045;
-        d(sel)=((200*v(sel)+11)/211).^2.4;
-    end
 
     refs={...
-        'srgb',[.64,.33;.3,.6;.15,.06],'d65',@sRGBgamma; ...
+        'srgb',[.64,.33;.3,.6;.15,.06],'d65',@(v) sRGBgamma(v); ...
         'bt.2020',[.708,.292;.17,.797;.131,.046],'d65',@(v) v.^2.4;...
         'dci-p3',[.68,.32;.265,.69;.15,.06],'dci-p3',@(v) v.^2.4;...
         'd65-p3',[.68,.32;.265,.69;.15,.06],'d65',@(v) v.^2.4;...

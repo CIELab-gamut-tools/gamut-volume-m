@@ -119,7 +119,11 @@ function PlotRings(gamut, varargin)
 % https://github.com/CIELab-gamut-tools/gamut-volume-m
 
 %import all of the functions in the +CIEtools folder
-import CIEtools.*
+try
+    import CIEtools.*;
+catch
+    octimport CIEtools;
+end
 
 %Use matlab's in-built input parser to deal with the params and options
 p = inputParser;
@@ -246,7 +250,7 @@ end
 
 for n=1:numel(labelIndices)
     i=labelIndices(n);
-    text(x(i+1,floor(end*15/16)),y(i+1,floor(end*15/16)),sprintf('L*=%d',lrings(i)),'Color',cols{n},'FontWeight','demi');
+    text(x(i+1,floor(end*15/16)),y(i+1,floor(end*15/16)),sprintf('L*=%d',lrings(i)),'Color',cols{n},'FontWeight','normal');
 end
 
 % ================== Centre mark ===================== %
