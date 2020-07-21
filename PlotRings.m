@@ -125,6 +125,13 @@ catch
     octimport CIEtools;
 end
 
+%Set some implementation dependent constants
+if isOctave
+    ASCALE=30;
+else
+    ASCALE=200;
+end
+
 %Use matlab's in-built input parser to deal with the params and options
 p = inputParser;
 
@@ -335,7 +342,7 @@ for n=1:max(nprims,nrefprims)
             noLegend(plot([opt(1),mpt(1)],[opt(2),mpt(2)],'Color',[0.7,0.7,0.7]));
             %then use quiver to plot an arrow from the mid-point to the tip
             rvect=[rpt(1)-mpt(1),rpt(2)-mpt(2)];
-            noLegend(quiver(mpt(1),mpt(2),rvect(1),rvect(2),'Color',rcol,'LineWidth',1.5,'MaxHeadSize',200/norm(rvect),'AutoScale','off'));
+            noLegend(quiver(mpt(1),mpt(2),rvect(1),rvect(2),'Color',rcol,'LineWidth',1.5,'MaxHeadSize',ASCALE/norm(rvect),'AutoScale','off'));
         end                        
     end
     %now do the gamut primary
@@ -362,7 +369,7 @@ for n=1:max(nprims,nrefprims)
             end
             %plot the arrow using quiver
             vect=pt-opt;
-            noLegend(quiver(opt(1),opt(2),vect(1),vect(2),'Color',col,'LineWidth',1.5,'MaxHeadSize',200/norm(vect),'AutoScale','off'));
+            noLegend(quiver(opt(1),opt(2),vect(1),vect(2),'Color',col,'LineWidth',1.5,'MaxHeadSize',ASCALE/norm(vect),'AutoScale','off'));
         end        
     end
     %if there was both a test and reference primary
@@ -375,7 +382,8 @@ end
 
 %add a little padding to the axis range
 axis(axis*1.05);
-%make the axes equal
+%make the axes equal and of known range
+axis([-1100 1100 -1100 1100]);
 axis equal
 %add the title
 t=sprintf('CIELab gamut rings\n%s\nVolume = %g',gamut.title, vol);
