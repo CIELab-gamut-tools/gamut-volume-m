@@ -188,6 +188,24 @@ hold on;
 
 % ================== Main figure ===================== %
 
+%add the coloured bands, if specified
+if (p.Results.ShowBands)
+    %fill in the colours
+    chroma=p.Results.BandChroma;
+    ls=p.Results.BandLs;
+    r=max(1,sqrt(x.^2+y.^2));
+    lim=size(x,2)*2;
+    TRI=[1:lim; 2:lim 1; 3:lim 1:2]; 
+    for n=1:size(x,1)-1
+        xc=reshape(x(n:n+1,:),[],1);
+        yc=reshape(y(n:n+1,:),[],1);
+        rc=reshape(r(n:n+1,:),[],1);
+        rgb=lab2srgb([ls(n)+rc*0, chroma*xc./rc, chroma*yc./rc])/255;
+        noLegend(patch('XData',xc(TRI),'YData',yc(TRI),'EdgeColor','none',...
+          'FaceVertexCData',rgb(TRI,:),'FaceColor','interp'));
+    end
+end
+
 %plot the figure
 if ~isempty(p.Results.RingLine)
     h=plot(x(:,[1:end 1])',y(:,[1:end 1])',p.Results.RingLine);
@@ -209,26 +227,6 @@ if ~strcmp(ringRef,'none')
     xd=x(2:end,:).*rsc;
     yd=y(2:end,:).*rsc;
     noLegend(plot(xd(:,[1:end 1])',yd(:,[1:end 1])',p.Results.RefLine));
-end
-
-%add the coloured bands, if specified
-if (p.Results.ShowBands)
-    %fill in the colours
-    chroma=p.Results.BandChroma;
-    ls=p.Results.BandLs;
-    r=max(1,sqrt(x.^2+y.^2));
-    lim=size(x,2)*2;
-    TRI=[1:lim; 2:lim 1; 3:lim 1:2]'; 
-    for n=1:size(x,1)-1
-        xc=reshape(x(n:n+1,:),[],1);
-        yc=reshape(y(n:n+1,:),[],1);
-        rc=reshape(r(n:n+1,:),[],1);
-        rgb=lab2srgb([ls(n)+rc*0, chroma*xc./rc, chroma*yc./rc])/255;
-        noLegend(trisurf(TRI,xc,yc,zeros(lim,1)-1,...
-            'EdgeColor','none',...
-            'FaceVertexCData',rgb,...
-            'FaceColor','interp'));
-    end
 end
 
 
@@ -382,8 +380,7 @@ end
 
 %add a little padding to the axis range
 axis(axis*1.05);
-%make the axes equal and of known range
-axis([-1100 1100 -1100 1100]);
+%make the axes equal
 axis equal
 %add the title
 t=sprintf('CIELab gamut rings\n%s\nVolume = %g',gamut.title, vol);

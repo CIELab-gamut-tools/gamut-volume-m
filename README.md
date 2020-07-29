@@ -1,6 +1,6 @@
 # gamut-volume-m
 CIELab gamut volume calculation and visualisation in matlab/octave
-## Installing pre-requisites
+## Pre-requisites
 ### Matlab / Octave
 To use this code you need _either_ Matlab or Octave installed.  Matlab is commercial software and can be obtained from the [Mathworks Website](https://www.mathworks.com).
 GNU/Octave is free open source software which can be downloaded from [the GNU website](https://www.gnu.org/software/octave/). 
@@ -21,7 +21,28 @@ To run all unit tests (contained in the `+tests` package folder), navigate to th
 ```matlab
 runtests('tests');
 ```
-## Use
+## Quick-start
+
+First we want to load up a sample gamut file.  If `CIELabGamut` is called with no parameters then a file browser will
+be opened.  To do this, and assign the returned result to a variable called `gamut` do the following:
+```matlab
+gamut = CIELabGamut();
+``` 
+and then browse for `lcd.txt` cgats file in the `samples` folder.  To make a Gamut Rings plot if this gamut:
+```matlab
+PlotRings(gamut);
+```
+It is usually the case that a reference gamut is also included in the plot.  To generate an sRGB reference gamut:
+```matlab
+srgb = SyntheticGamut('srgb');
+```
+and to include it as a reference in the rings plot:
+```matlab
+PlotRings(gamut,srgb);
+legend('LCD gamut','sRGB gamut');
+```
+
+## Function reference 
 
 ### `CIELabGamut`
 The `CIELabGamut` function creates a gamut data structure from either supplied matrix data or from a CGATS data file.
