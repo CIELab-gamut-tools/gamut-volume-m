@@ -21,7 +21,7 @@ To run all unit tests (contained in the `+tests` package folder), navigate to th
 ```matlab
 runtests('tests');
 ```
-## Quick-start
+## Quick-start / Tutorial
 
 First we want to load up a sample gamut file.  If `CIELabGamut` is called with no parameters then a file browser will
 be opened.  To do this, and assign the returned result to a variable called `gamut` do the following:
@@ -40,6 +40,17 @@ and to include it as a reference in the rings plot:
 ```matlab
 PlotRings(gamut,srgb);
 legend('LCD gamut','sRGB gamut');
+```
+The `GetVolume` function can be used to return the gamut volumes of any gamut, but in this case, as we are comparing to
+a reference gamut it is better to calculate the gamut volume coverage, which is the percentage of the reference gamut
+covered by the test gamut.  To do this we need the intersection:
+```matlab
+gamutIntersection = IntetersectGamuts(gamut,srgb);
+coverage = GetVolume(gamutIntersection)/GetVolume(srgb);
+```
+Then display this on the plot title:
+```matlab
+title(sprintf('LCD gamut, sRGB coverage = %.0f%%',coverage*100));
 ```
 
 ## Function reference 
