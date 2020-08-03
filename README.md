@@ -16,12 +16,12 @@ git clone https://github.com/CIELab-gamut-tools/gamut-volume-m.git
 ### Without using `git`
 Download the zip file with the project from [here](https://github.com/CIELab-gamut-tools/gamut-volume-m/archive/master.zip)
 and unzip it into a suitable folder.  You may want to rename the unzipped folder from `gamut-volume-m-master` to `gamut-volume-m` to be consistant with the `git` instructions above. 
-## Testing
-To run all unit tests (contained in the `+tests` package folder), navigate to the project folder from within matlab, then:
-```matlab
-runtests('tests');
-```
-## Quick-start / Tutorial
+
+## Quick-start
+
+This guide assumes some basic familiarity with Matlab.  For the complete Matlab or Octave novice, please have a look at [Getting Started with MATLAB](https://mathworks.com/help/matlab/getting-started-with-matlab.html)
+and/or [GNU Octave, Getting Started](https://octave.org/doc/v4.0.1/Getting-Started.html).  Even if using Octave the Matlab link provides
+more help getting started with the language itself.  
 
 First we want to load up a sample gamut file.  If `CIELabGamut` is called with no parameters then a file browser will
 be opened.  To do this, and assign the returned result to a variable called `gamut` do the following:
@@ -157,3 +157,10 @@ PlotRings(gamut, sRGB,...
   'RefPrimaries','all'); %And the reference primaries
 ```
 see more detailed help within Matlab/Octave using `help PlotRings` or `doc PlotRings` (Matlab only) from within the project folder.
+
+## Testing
+To run all unit tests contained in the `+tests` package folder, navigate to the project folder from within matlab, then:
+```matlab
+runtests('tests');
+```
+There is still work needed to get the tests to work in Octave, so for the moment the unit tests are matlab only.
