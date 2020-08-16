@@ -192,7 +192,7 @@ function [gamut] = SyntheticGamut(varargin)
     addParameter(p,'Gamma',[],@(x) isscalar(x) || isfun(x));
     addParameter(p,'Black',[], @(x) isChrom(x,1,1));
     addParameter(p,'BlackRatio',0,@isscalar);
-    addParameter(p,'Steps',10,@isscalar);
+    addParameter(p,'Steps',10,@isnumeric);
     addParameter(p,'Name',[], @(x) ischar(x) || isstring(x));
     parse(p,varargin{idx:end});
     
@@ -245,7 +245,12 @@ function [gamut] = SyntheticGamut(varargin)
     end
     
     % Calculate the RGB cube
-    [~,RGB]=make_tesselation(0:1/steps:1);
+    if isscalar(steps)
+        steps = 0:1/steps:1;
+    else
+        steps = steps / max(steps);
+    end
+    [~,RGB]=make_tesselation(steps);
     RGB=unique(RGB,'rows');
     
     % get the drive levels

@@ -182,7 +182,7 @@ lrings = p.Results.LRings;
 %calculate the main set of gamut rings
 [x,y,~,vol] = calcRings(gamut,lrings);
 
-clf;
+cla;
 box on;
 hold on;
 
