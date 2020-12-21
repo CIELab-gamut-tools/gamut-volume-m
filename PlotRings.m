@@ -236,11 +236,12 @@ end
 %    ischar: 'default' or a colour name
 %    isnumeric: 1 x 3 or n x 3 array of colours
 %    iscell: a cell entry per colour (this is what will be output)
-labelIndices = p.Results.LLabelIndices(p.Results.LLabelIndices<=numel(lrings));
+allLRings = [lrings, 100];
+labelIndices = p.Results.LLabelIndices(p.Results.LLabelIndices<=numel(allLRings));
 cols = p.Results.LLabelColors;
 if ischar(cols) || isstring(cols)
     if strcmp(p.Results.LLabelColors,'default')
-        cols=(p.Results.LLabelIndices(:)<numel(lrings))*[1,1,1];
+        cols=(p.Results.LLabelIndices(:)<numel(allLRings))*[1,1,1];
     else
         cols=repmat({cols},numel(labelIndices));
     end
@@ -255,7 +256,7 @@ end
 
 for n=1:numel(labelIndices)
     i=labelIndices(n);
-    text(x(i+1,floor(end*15/16)),y(i+1,floor(end*15/16)),sprintf('L*=%d',lrings(i)),'Color',cols{n},'FontWeight','normal');
+    text(x(i+1,floor(end*15/16)),y(i+1,floor(end*15/16)),sprintf('L*=%d',allLRings(i)),'Color',cols{n},'FontWeight','normal');
 end
 
 % ================== Centre mark ===================== %
