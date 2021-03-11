@@ -190,7 +190,7 @@ function [gamut] = SyntheticGamut(varargin)
     % The rest of the parameters can use the input parser
     p=inputParser;
     addParameter(p,'Gamma',[],@(x) isscalar(x) || isfun(x));
-    addParameter(p,'Black',[], @(x) isChrom(x,1,1));
+    addParameter(p,'Black',[], iscol);
     addParameter(p,'BlackRatio',0,@isscalar);
     addParameter(p,'Steps',10,@isnumeric);
     addParameter(p,'Name',[], @(x) ischar(x) || isstring(x));
