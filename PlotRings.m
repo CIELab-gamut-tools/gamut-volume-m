@@ -114,6 +114,10 @@ function PlotRings(gamut, varargin)
 %   PrimaryOrigin     - From where the ref primary arrows will be drawn.
 %                     - ['ring' (default) | 'centre' | 'center']
 %
+%  +Scatter Point Data
+%   ScatterData       - An n x 3 matrix of L*,a*,b* data, to be used as
+%                       scatter points.
+%
 % See also CIELabGamut, PlotVolume, GetVolume, IntersectGamuts, SyntheticGamut
 %
 % https://github.com/CIELab-gamut-tools/gamut-volume-m
@@ -170,6 +174,9 @@ addParameter(p,'RefPrimaryChroma',1000,@isnumeric);
 addParameter(p,'RefPrimaryOrigin','ring',@(x) any(validatestring(x,{'centre','center','ring'},'PlotRings')));
 addParameter(p,'Primaries','rgb',@(x) any(validatestring(x,{'none','rgb','all'},'PlotRings')));
 addParameter(p,'RefPrimaries','none',@(x) any(validatestring(x,{'none','rgb','all'},'PlotRings')));
+
+%=====Scatter Point Data=====
+addParameter(p,'ScatterData',[],@(x) isnumeric(x)&&size(x,2)==3);
 
 % now run the parser on the input parameters
 parse(p,gamut,varargin{:});
@@ -388,6 +395,33 @@ title(t);
 %and the axis labels
 xlabel('a^*_{RSS}')
 ylabel('b^*_{RSS}')
+
+% ================== Scatter Points ===================== %
+if ~isempty(p.Results.ScatterData)
+  dH=2*pi/gamut.hsteps;
+  dL=100/gamut.Lsteps;
+  LAB = p.Results.ScatterData;
+  [LABu,~,ic] = unique(LAB,'rows');
+  cnt = accumarray(ic,1);
+  i = floor(LABu(:,1)/10);
+  a = atan2(LABu(:,2),LABu(:,3));
+  h = mod(a/pi*180+360,360);
+  rx = interp2(0:360,0:10,x(:,[end 1:end]),h,i);
+  ry = interp2(0:360,0:10,y(:,[end 1:end]),h,i);
+  v = sum(LABu(:,2:3).^2,2)*dL*10*dH/2;
+  bv = (rx.^2+ry.^2)*dH/2;
+  r = (2*(bv+v)/dH).^0.5;
+  mr=ceil(max(r(:)));
+  density = accumarray([floor(sin(a).*r+0.5)+mr+1,floor(cos(a).*r+0.5)+mr+1],cnt,[2*mr+1,2*mr+1]);
+  density = conv2(density,ones(3,3),'same');
+%   density = conv2(density,ones(3,3),'same');
+%   density = conv2(density,ones(3,3),'same');
+  alph = zeros(size(density));
+  alph(density>0) = (log(density(density>0))+2)/(log(max(density(:)))+2);
+  % alph=(density'/max(density(:))).^0.25;
+  image(-mr:mr,-mr:mr,zeros(2*mr+1,2*mr+1,3),'AlphaData',alph');
+end
+
 hold off;
 end
 
