@@ -301,12 +301,12 @@ end
 
 % ================== Reference rings ===================== %
 %if a reference is supplied, add just the L*=100 line
-if ~isempty(refgamut)
+if ~isempty(refgamut) && strcmp(ringRef,'none')
     [xref,yref] = calcRings(refgamut,[]);
     plot(xref(end,[1:end 1]),yref(end,[1:end 1]),p.Results.RefLine);
 end
 %if a second reference is supplied, add just the L*=100 line
-if ~isempty(refgamut2)
+if ~isempty(refgamut2) && strcmp(ringRef,'none')
     [xref2,yref2] = calcRings(refgamut2,[]);
     plot(xref2(end,[1:end 1]),yref2(end,[1:end 1]),p.Results.Ref2Line);
 end
