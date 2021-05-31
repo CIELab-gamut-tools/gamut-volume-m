@@ -27,6 +27,13 @@ function PlotRings(gamut, varargin)
 %     'RefPrimaries','all'); %And the reference primaries
 %
 % Parameters:
+% +General
+%   Axes              - Set which axes to use for the plot
+%                       [gca (default) | axes handle]
+%
+%   ClearAxes         - Set if the current axes should be cleared
+%                       [true (default) | false]
+%
 % +Gamut Rings Format
 %   LRings            - The inner L* values of the gamut rings. The outer
 %                       ring, L*=100, is always shown.
@@ -151,6 +158,10 @@ addRequired(p,'gamut',validGamut);
 addOptional(p,'ref',[],validGamut);
 addOptional(p,'ref2',[],validGamut);
 
+%=====General Figure Options=====
+addParameter(p,'Axes',gca,@ishghandle);
+addParameter(p,'ClearAxes',true,@islogical);
+
 %=====Gamut Ring Format=====
 addParameter(p,'LRings',10:10:90,@isnumeric);
 addParameter(p,'LLabelIndices',[1,5],@isnumeric);
@@ -193,7 +204,8 @@ lrings = p.Results.LRings;
 %calculate the main set of gamut rings
 [x,y,~,vol] = calcRings(gamut,lrings);
 
-cla;
+axes(p.Results.Axes);
+if (p.Results.ClearAxes), cla; end
 box on;
 hold on;
 
