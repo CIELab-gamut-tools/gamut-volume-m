@@ -74,8 +74,12 @@ function PlotRings(gamut, varargin)
 %                       this to 0 for the bands to be monochrome.
 %                       [50 (default) | positive scalar]
 %
-%   BandLs            - The lightnesses of the bands.
-%                       [20:70/9:90 (default) | vector]
+%   BandLs            - The lightnesses of the bands.  If this is a
+%                       2-element vector then it indicates the min and max
+%                       lightnesses, otherwise the number of values must
+%                       match the number of bands defined in LRings
+%                       *including the outer L*=100 band*
+%                       [[20 90] (default) | vector]
 %
 % +Decorations
 %   CentMark          - The linespec of the centre marker.  An empty array
@@ -160,7 +164,7 @@ addParameter(p,'RingReference','none',@(x) any(validatestring(x,{'none','interse
 %=====Gamut Band Format=====
 addParameter(p,'ShowBands',true,@islogical);
 addParameter(p,'BandChroma',50,@isnumeric);
-addParameter(p,'BandLs',20:70/9:90,@isnumeric);
+addParameter(p,'BandLs',[20 90],@isnumeric);
 
 %=====Chart Decorations=====
 addParameter(p,'CentMark','+k',@ischar);
@@ -200,10 +204,14 @@ if (p.Results.ShowBands)
     %fill in the colours
     chroma=p.Results.BandChroma;
     ls=p.Results.BandLs;
+    N=size(x,1)-1;
+    if numel(ls)==2
+      ls=ls(1):(ls(2)-ls(1))/N:ls(2);
+    end
     r=max(1,sqrt(x.^2+y.^2));
     lim=size(x,2)*2;
     TRI=[1:lim; 2:lim 1; 3:lim 1:2]; 
-    for n=1:size(x,1)-1
+    for n=1:N
         xc=reshape(x(n:n+1,:),[],1);
         yc=reshape(y(n:n+1,:),[],1);
         rc=reshape(r(n:n+1,:),[],1);
@@ -243,11 +251,12 @@ end
 %    ischar: 'default' or a colour name
 %    isnumeric: 1 x 3 or n x 3 array of colours
 %    iscell: a cell entry per colour (this is what will be output)
-labelIndices = p.Results.LLabelIndices(p.Results.LLabelIndices<=numel(lrings));
+allLRings = [lrings, 100];
+labelIndices = p.Results.LLabelIndices(p.Results.LLabelIndices<=numel(allLRings));
 cols = p.Results.LLabelColors;
 if ischar(cols) || isstring(cols)
     if strcmp(p.Results.LLabelColors,'default')
-        cols=(p.Results.LLabelIndices(:)<numel(lrings))*[1,1,1];
+        cols=(p.Results.LLabelIndices(:)<numel(allLRings))*[1,1,1];
     else
         cols=repmat({cols},numel(labelIndices));
     end
@@ -262,7 +271,7 @@ end
 
 for n=1:numel(labelIndices)
     i=labelIndices(n);
-    text(x(i+1,floor(end*15/16)),y(i+1,floor(end*15/16)),sprintf('L*=%d',lrings(i)),'Color',cols{n},'FontWeight','normal');
+    text(x(i+1,floor(end*15/16)),y(i+1,floor(end*15/16)),sprintf('L*=%d',allLRings(i)),'Color',cols{n},'FontWeight','normal');
 end
 
 % ================== Centre mark ===================== %
