@@ -79,10 +79,11 @@ gamut.XYZn = gamut.XYZ(all(gamut.RGB==gamut.RGBmax,2),:);
 %Get a D50 white point of equivalent luminance
 D50=[0.9642957, 1, 0.8251046]*gamut.XYZn(2);
 
-%Chromatically adapt CIE XYZ to D50 using CIECAM02 CAT
+%Chromatically adapt CIE XYZ to D50 using CIECAM02 CAT, keeping a copy of the raw uncorrected data
 %assuming full adaptation and using the 'Bradford' coefficients
 %if XYZn is already D50 this is harmless, and a check will fail without a
 %reasonable tolerance.  Simplest is just to always adapt.
+gamut.XYZ_raw = gamut.XYZ;
 gamut.XYZ = camcat_cc(gamut.XYZ, gamut.XYZn, D50);
 gamut.XYZn = D50;
 
