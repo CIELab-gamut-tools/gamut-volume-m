@@ -215,9 +215,9 @@ addParameter(p,'CentMarkSize',20,@isscalar);
 addParameter(p,'ChromaRings',0,@isnumeric);
 
 %=====Primary colour indicators=====
-addParameter(p,'PrimaryChroma',1150,@isnumeric);
+addParameter(p,'PrimaryChroma',950,@isnumeric);
 addParameter(p,'PrimaryOrigin','centre',@(x) any(validatestring(x,{'centre','center','ring'},'PlotRings')));
-addParameter(p,'RefPrimaryChroma',1200,@isnumeric);
+addParameter(p,'RefPrimaryChroma',1000,@isnumeric);
 addParameter(p,'RefPrimaryOrigin','ring',@(x) any(validatestring(x,{'centre','center','ring'},'PlotRings')));
 addParameter(p,'Primaries','rgb',@(x) any(validatestring(x,{'none','rgb','all'},'PlotRings')));
 addParameter(p,'RefPrimaries','none',@(x) any(validatestring(x,{'none','rgb','all'},'PlotRings')));
