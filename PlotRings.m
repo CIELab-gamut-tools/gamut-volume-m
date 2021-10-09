@@ -145,7 +145,7 @@ function PlotRings(gamut, varargin)
 %   RefPrimaryChroma  - The C_RSS radius of the ref primary arrow head.
 %                       [1000 (default) | positive scalar] 
 %
-%   PrimaryOrigin     - From where the ref primary arrows will be drawn.
+%   RefPrimaryOrigin  - From where the ref primary arrows will be drawn.
 %                     - ['ring' (default) | 'centre' | 'center']
 %
 %  +Scatter Point Data
@@ -219,7 +219,7 @@ addParameter(p,'PrimaryChroma',1150,@isnumeric);
 addParameter(p,'PrimaryOrigin','centre',@(x) any(validatestring(x,{'centre','center','ring'},'PlotRings')));
 addParameter(p,'RefPrimaryChroma',1200,@isnumeric);
 addParameter(p,'RefPrimaryOrigin','ring',@(x) any(validatestring(x,{'centre','center','ring'},'PlotRings')));
-addParameter(p,'Primaries','none',@(x) any(validatestring(x,{'none','rgb','all'},'PlotRings')));
+addParameter(p,'Primaries','rgb',@(x) any(validatestring(x,{'none','rgb','all'},'PlotRings')));
 addParameter(p,'RefPrimaries','none',@(x) any(validatestring(x,{'none','rgb','all'},'PlotRings')));
 
 %=====Scatter Point Data=====
