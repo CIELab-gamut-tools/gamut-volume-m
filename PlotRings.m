@@ -200,14 +200,15 @@ addParameter(p,'IntersectGamuts',false,@islogical);
 addParameter(p,'IntersectionPlot',false,@islogical);
 
 %=====Gamut Band Format=====
+validHue = @(x) isnumeric(x) || any(validatestring(x,{'match'},'PlotRings'));
 addParameter(p,'ShowBands',true,@islogical);
 addParameter(p,'BandChroma',50,@isnumeric);
 addParameter(p,'BandLs',[20 90],@isnumeric);
-addParameter(p,'BandHue','match',@(x) isnumeric(x) || any(validatestring(x,{'match'},'PlotRings')));
+addParameter(p,'BandHue','match',validHue);
 addParameter(p,'ShowRefBands',true,@islogical);
 addParameter(p,'RefBandChroma',0,@isnumeric);
 addParameter(p,'RefBandLs',[30 98],@isnumeric);
-addParameter(p,'RefBandHue','match',@(x) isnumeric(x) || any(validatestring(x,{'match'},'PlotRings')));
+addParameter(p,'RefBandHue','match',validHue);
 
 %=====Chart Decorations=====
 addParameter(p,'CentMark','+k',@ischar);
@@ -215,12 +216,17 @@ addParameter(p,'CentMarkSize',20,@isscalar);
 addParameter(p,'ChromaRings',0,@isnumeric);
 
 %=====Primary colour indicators=====
+validateOrigin = @(x) validatestring(x,{'centre','center','ring'},'PlotRings');
+validOrigin = @(x) any(validateOrigin(x));
+validPrimaries = @(x) any(validatestring(x,{'none','rgb','all'},'PlotRings'));
 addParameter(p,'PrimaryChroma',950,@isnumeric);
-addParameter(p,'PrimaryOrigin','centre',@(x) any(validatestring(x,{'centre','center','ring'},'PlotRings')));
+addParameter(p,'PrimaryChromaOffset','centre',validOrigin);
+addParameter(p,'PrimaryOrigin','centre',validOrigin);
 addParameter(p,'RefPrimaryChroma',1000,@isnumeric);
-addParameter(p,'RefPrimaryOrigin','ring',@(x) any(validatestring(x,{'centre','center','ring'},'PlotRings')));
-addParameter(p,'Primaries','rgb',@(x) any(validatestring(x,{'none','rgb','all'},'PlotRings')));
-addParameter(p,'RefPrimaries','none',@(x) any(validatestring(x,{'none','rgb','all'},'PlotRings')));
+addParameter(p,'RefPrimaryChromaOffset','centre',validOrigin);
+addParameter(p,'RefPrimaryOrigin','ring',validOrigin);
+addParameter(p,'Primaries','rgb',validPrimaries);
+addParameter(p,'RefPrimaries','none',validPrimaries);
 
 %=====Scatter Point Data=====
 addParameter(p,'ScatterData',[],@(x) isnumeric(x)&&size(x,2)==3);
@@ -253,6 +259,9 @@ else
   rings = ringsBase(testGamut,lrings);
   testX = rings.x(2:end,:);
   testY = rings.y(2:end,:);
+  if ~isempty(refgamut)
+      [refX,refY] = calcRings(refgamut,[]);
+  end
   testVol = rings.vol;
   if validGamut(refgamut), refVol = GetVolume(refgamut); end
 end
@@ -384,8 +393,10 @@ end
 
 r=p.Results.PrimaryChroma;
 rr=p.Results.RefPrimaryChroma;
-ringorigin=strcmp(validatestring(p.Results.PrimaryOrigin,{'centre','center','ring'}),'ring');
-rringorigin=strcmp(validatestring(p.Results.RefPrimaryOrigin,{'centre','center','ring'}),'ring');
+ringorigin=strcmp(validateOrigin(p.Results.PrimaryOrigin),'ring');
+ringoffset=strcmp(validateOrigin(p.Results.PrimaryChromaOffset),'ring');
+rringorigin=strcmp(validateOrigin(p.Results.RefPrimaryOrigin),'ring');
+rringoffset=strcmp(validateOrigin(p.Results.RefPrimaryChromaOffset),'ring');
 %loop through all the primaries (RGBCMY) for which indicators are required
 for n=1:max(nprims,nrefprims)
     ri=[];
@@ -400,17 +411,25 @@ for n=1:max(nprims,nrefprims)
             rlab=refgamut.LAB(ri,:);
             %calculate the nearest sRGB colour
             rcol=lab2srgb(rlab)/255;
-            %calculate the end of the arrow
-            rpt=rlab(2:3)*rr/norm(rlab(2:3));
-            %and the hue - may be needed for the origin or a linking arc
+            %calculate the hue - may be needed for the origin or a linking arc
             rhue=mod(floor(0.5+atan2(rlab(2),rlab(3))/pi*180)+719,360)+1;
+            %calculate the chroma of the outer ring at this hue
+            rringchroma = sqrt(refX(end,rhue).^2+refY(end,rhue).^2);
+            %offset the head chroma if need be
+            if (rringoffset)
+                rchroma = rr + rringchroma;
+            else
+                rchroma = rr;
+            end
+            %calculate the end of the arrow
+            rpt=rlab(2:3)*rchroma/norm(rlab(2:3));
             %and a mid-point - the reference arrows are only coloured at
             %their ends
             mpt=rpt*0.9;
             if (rringorigin)
                 %start from the ring, so find the closest hue angle
                 %and get the point on the ring
-                opt=[xref(end,rhue),yref(end,rhue)];
+                opt=rlab(2:3)*rringchroma/norm(rlab(2:3));
             else
                 %start from the origin
                 opt=[0,0];
@@ -433,14 +452,22 @@ for n=1:max(nprims,nrefprims)
             lab=gamut.LAB(i,:);
             %calculate the nearest sRGB colour
             col=lab2srgb(lab)/255;
-            %calculate the end of the arrow
-            pt=lab(2:3)*r/norm(lab(2:3));
-            %and the hue
+            %calculate the hue
             hue=mod(floor(0.5+atan2(lab(2),lab(3))/pi*180)+719,360)+1;
+            %calculate the chroma of the outer ring at this hue
+            ringchroma = sqrt(rings.x(end,hue).^2+rings.y(end,hue).^2);
+            %offset the head chroma if need be
+            if (ringoffset)
+                chroma = r + ringchroma;
+            else
+                chroma = r;
+            end
+            %calculate the end of the arrow
+            pt=lab(2:3)*chroma/norm(lab(2:3));
             %and the start
             if (ringorigin)
                 %from the ring
-                opt=[rings.x(end,hue),rings.y(end,hue)];
+                opt=lab(2:3)*ringchroma/norm(lab(2:3));
             else
                 %or from the origin
                 opt=[0,0];
@@ -454,7 +481,7 @@ for n=1:max(nprims,nrefprims)
     if (~(isempty(refgamut) || isempty(ri) || isempty(i)))
         %make a little dotted arc to link them.
         rng=(hue:sign(rhue-hue):rhue)/180*pi;
-        noLegend(plot(0.95*r*sin(rng),0.95*r*cos(rng),':k'));
+        noLegend(plot(0.95*chroma*sin(rng),0.95*chroma*cos(rng),':k'));
     end
 end
 
@@ -486,7 +513,7 @@ if ~isempty(p.Results.ScatterData)
   r = (2*(bv+v)/dH).^0.5;
   mr=ceil(max(r(:)));
   density = accumarray([floor(sin(a).*r+0.5)+mr+1,floor(cos(a).*r+0.5)+mr+1],cnt,[2*mr+1,2*mr+1]);
-  density = conv2(density,ones(3,3),'same');
+  density = conv2(density,[0,1,0;1,2,1;0,1,0],'same');
 %   density = conv2(density,ones(3,3),'same');
 %   density = conv2(density,ones(3,3),'same');
   alph = zeros(size(density));
@@ -525,10 +552,10 @@ function [rings] = ringsBase(gamut, LRings, ref)
      dL=100/gamut.Lsteps;
      %get the map of the volume in cylintrical coordinates
      volmapFn = @(a) sum(a(:,1).*(a(:,2).^2)*dL*dH/2);
-     volmap=cellfun(volmapFn,gamut.cylmap);
      if (nargin > 2)
-       refVolmap=cellfun(volmapFn,ref.cylmap);
-       volmap = max(volmap, refVolmap);
+       volmap=cellfun(volmapFn,ref.cylmap);
+     else
+       volmap=cellfun(volmapFn,gamut.cylmap);
      end
      %Get the accumulated volume sum (the final row will be the total)
      %and calculate the radius required to represent that volume
