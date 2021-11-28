@@ -45,7 +45,7 @@ The `GetVolume` function can be used to return the gamut volumes of any gamut, b
 a reference gamut it is better to calculate the gamut volume coverage, which is the percentage of the reference gamut
 covered by the test gamut.  To do this we need the intersection:
 ```matlab
-gamutIntersection = IntetersectGamuts(gamut,srgb);
+gamutIntersection = IntersectGamuts(gamut,srgb);
 coverage = GetVolume(gamutIntersection)/GetVolume(srgb);
 ```
 Then display this on the plot title:
