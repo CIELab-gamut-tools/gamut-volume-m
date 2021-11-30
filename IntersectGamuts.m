@@ -37,6 +37,10 @@ gamut.cylmap=cellfun(@intersect,g1.cylmap,g2.cylmap,'UniformOutput',false);
 end
 
 function [c]=intersect(a,b)
+    % fix switched pairs of faces
+    a = a(cumsum(a(:,1),'reverse')*2-a(:,1)==1,:);
+    b = b(cumsum(b(:,1),'reverse')*2-b(:,1)==1,:);
+    
     sa=size(a,1);
     sb=size(b,1);
     c=zeros(sa+sb,4);
@@ -47,4 +51,6 @@ function [c]=intersect(a,b)
     t=min(cumsum(c(i,3:4)),[],2);
     c=c(i([false; diff(t)~=0]),1:2);
 end
+
+
 
