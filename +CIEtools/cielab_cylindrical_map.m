@@ -66,6 +66,12 @@ for p=2:size(L,1)
         if (sum(ix)==0)
             ix= u>=-0.001 & v>=-0.001& u+v<=1.001 & t>=0;
         end
-        cylmap(p-1,q-1)={[sign(idet(ix)),t(ix)]};
+        % sort the intersections
+        cm = [sign(idet(ix)),t(ix)];
+        [~,idx] = sort(cm(:,2));
+        cm = cm(idx,:);
+        % check for a common surface parity error
+        cm = cm(cumsum(cm(:,1),'reverse')*2-cm(:,1)==1,:);
+        cylmap{p-1,q-1}=cm;
     end                 
 end
