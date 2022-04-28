@@ -133,8 +133,14 @@ function PlotRings(gamut, varargin)
 %                       reproduction).
 %                       ['rgb' (default) | 'none' | 'all']
 %
+%   PrimaryColor      - The colours of the vector arrows are, by default
+%   PrimaryColour       set to equal the observed colour of the primary
+%                       ('output').  They can also be set to the nominal
+%                       primary colour ('input');
+%                       ['input' | 'output' (default)]
+%
 %   PrimaryChroma     - The C_RSS radius of the primary arrow head.
-%                       [950 (default) | positive scalar] 
+%                       [950 (default) | positive scalar | 'auto'] 
 %
 %   PrimaryOrigin     - From where the primary arrows will be drawn.
 %                     - ['centre' (default) | 'center' | 'ring']
@@ -143,7 +149,7 @@ function PlotRings(gamut, varargin)
 %                       ['none' (default) | 'rgb' | 'all']
 %
 %   RefPrimaryChroma  - The C_RSS radius of the ref primary arrow head.
-%                       [1000 (default) | positive scalar] 
+%                       [1000 (default) | positive scalar | 'auto'] 
 %
 %   RefPrimaryOrigin  - From where the ref primary arrows will be drawn.
 %                     - ['ring' (default) | 'centre' | 'center']
