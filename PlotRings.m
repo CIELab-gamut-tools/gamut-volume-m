@@ -133,17 +133,27 @@ function PlotRings(gamut, varargin)
 %                       reproduction).
 %                       ['rgb' (default) | 'none' | 'all']
 %
+%   PrimaryColor      - The colours of the vector arrows are, by default
+%   PrimaryColour       set to equal the observed colour of the primary
+%                       ('output').  They can also be set to the nominal
+%                       primary colour ('input');
+%                       ['input' | 'output' (default)]
+%
 %   PrimaryChroma     - The C_RSS radius of the primary arrow head.
-%                       [950 (default) | positive scalar] 
+%                       If 'auto' it will be the max ring or ref chroma
+%                       plus 100.
+%                       [950 (default) | positive scalar | 'auto'] 
 %
 %   PrimaryOrigin     - From where the primary arrows will be drawn.
-%                     - ['centre' (default) | 'center' | 'ring']
+%                       ['centre' (default) | 'center' | 'ring']
+%
 %
 %   RefPrimaries      - Which reference primaries to show
 %                       ['none' (default) | 'rgb' | 'all']
 %
 %   RefPrimaryChroma  - The C_RSS radius of the ref primary arrow head.
-%                       [1000 (default) | positive scalar] 
+%                       If 'auto' it will be the PrimaryChroma + 50
+%                       [positive scalar | 'auto' (default)] 
 %
 %   RefPrimaryOrigin  - From where the ref primary arrows will be drawn.
 %                     - ['ring' (default) | 'centre' | 'center']
@@ -219,14 +229,18 @@ addParameter(p,'ChromaRings',0,@isnumeric);
 validateOrigin = @(x) validatestring(x,{'centre','center','ring'},'PlotRings');
 validOrigin = @(x) any(validateOrigin(x));
 validPrimaries = @(x) any(validatestring(x,{'none','rgb','all'},'PlotRings'));
-addParameter(p,'PrimaryChroma',950,@isnumeric);
+validChroma = @(x) isnumeric(x) || any(validatestring(x,{'auto'},'PlotRings'));
+addParameter(p,'PrimaryChroma',950,validChroma);
 addParameter(p,'PrimaryChromaOffset','centre',validOrigin);
 addParameter(p,'PrimaryOrigin','centre',validOrigin);
-addParameter(p,'RefPrimaryChroma',1000,@isnumeric);
+addParameter(p,'RefPrimaryChroma',1000,validChroma);
 addParameter(p,'RefPrimaryChromaOffset','centre',validOrigin);
 addParameter(p,'RefPrimaryOrigin','ring',validOrigin);
 addParameter(p,'Primaries','rgb',validPrimaries);
 addParameter(p,'RefPrimaries','none',validPrimaries);
+validCol=  @(x) isempty(x) || any(validatestring(x,{'input','output'}));
+addParameter(p,'PrimaryColour',[],validCol);
+addParameter(p,'PrimaryColor',[],validCol);
 
 %=====Scatter Point Data=====
 addParameter(p,'ScatterData',[],@(x) isnumeric(x)&&size(x,2)==3);
@@ -267,9 +281,27 @@ else
 end
 
 axes(p.Results.Axes);
-if (p.Results.ClearAxes), cla; end
+if (p.Results.ClearAxes), clf; end
 box on;
 hold on;
+
+% calculate the max RSS chroma
+maxChroma = sqrt(max(testX(:).^2+testY(:).^2));
+if ~isempty(refgamut)
+    maxChroma = max(maxChroma, sqrt(max(refX(:).^2+refY(:).^2)));
+end
+
+if strcmp(p.Results.PrimaryChroma,'auto')
+  primaryChroma = maxChroma + 100;
+else
+  primaryChroma = p.Results.PrimaryChroma;    
+end
+
+if strcmp(p.Results.RefPrimaryChroma,'auto')
+  refPrimaryChroma = primaryChroma + 50;
+else
+  refPrimaryChroma = p.Results.RefPrimaryChroma;    
+end
 
 % ================== Main figure ===================== %
 
@@ -391,12 +423,13 @@ switch validatestring(p.Results.RefPrimaries,{'none','rgb','all'})
         nrefprims=6;
 end
 
-r=p.Results.PrimaryChroma;
-rr=p.Results.RefPrimaryChroma;
 ringorigin=strcmp(validateOrigin(p.Results.PrimaryOrigin),'ring');
 ringoffset=strcmp(validateOrigin(p.Results.PrimaryChromaOffset),'ring');
 rringorigin=strcmp(validateOrigin(p.Results.RefPrimaryOrigin),'ring');
 rringoffset=strcmp(validateOrigin(p.Results.RefPrimaryChromaOffset),'ring');
+vcolsource = p.Results.PrimaryColor;
+if isempty(vcolsource), vcolsource = p.Results.PrimaryColour; end
+usevcol = isempty(vcolsource) || strcmp(vcolsource,'output');
 %loop through all the primaries (RGBCMY) for which indicators are required
 for n=1:max(nprims,nrefprims)
     ri=[];
@@ -417,9 +450,9 @@ for n=1:max(nprims,nrefprims)
             rringchroma = sqrt(refX(end,rhue).^2+refY(end,rhue).^2);
             %offset the head chroma if need be
             if (rringoffset)
-                rchroma = rr + rringchroma;
+                rchroma = refPrimaryChroma + rringchroma;
             else
-                rchroma = rr;
+                rchroma = refPrimaryChroma;
             end
             %calculate the end of the arrow
             rpt=rlab(2:3)*rchroma/norm(rlab(2:3));
@@ -450,17 +483,21 @@ for n=1:max(nprims,nrefprims)
         if (~isempty(i))
             %get the Lab value
             lab=gamut.LAB(i,:);
-            %calculate the nearest sRGB colour
-            col=lab2srgb(lab)/255;
+            if usevcol
+              %calculate the nearest sRGB colour
+              col=lab2srgb(lab)/255;
+            else
+              col=prims(n,:);
+            end
             %calculate the hue
             hue=mod(floor(0.5+atan2(lab(2),lab(3))/pi*180)+719,360)+1;
             %calculate the chroma of the outer ring at this hue
             ringchroma = sqrt(rings.x(end,hue).^2+rings.y(end,hue).^2);
             %offset the head chroma if need be
             if (ringoffset)
-                chroma = r + ringchroma;
+                chroma = primaryChroma + ringchroma;
             else
-                chroma = r;
+                chroma = primaryChroma;
             end
             %calculate the end of the arrow
             pt=lab(2:3)*chroma/norm(lab(2:3));
