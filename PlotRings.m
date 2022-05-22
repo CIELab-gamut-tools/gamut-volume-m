@@ -143,7 +143,8 @@ function PlotRings(gamut, varargin)
 %                       [950 (default) | positive scalar | 'auto'] 
 %
 %   PrimaryOrigin     - From where the primary arrows will be drawn.
-%                     - ['centre' (default) | 'center' | 'ring']
+%                       ['centre' (default) | 'center' | 'ring']
+%
 %
 %   RefPrimaries      - Which reference primaries to show
 %                       ['none' (default) | 'rgb' | 'all']
@@ -233,6 +234,9 @@ addParameter(p,'RefPrimaryChromaOffset','centre',validOrigin);
 addParameter(p,'RefPrimaryOrigin','ring',validOrigin);
 addParameter(p,'Primaries','rgb',validPrimaries);
 addParameter(p,'RefPrimaries','none',validPrimaries);
+validCol=  @(x) isempty(x) || validatestring(x,{'input','output'});
+addParameter(p,'PrimaryColour',[],validCol);
+addParameter(p,'PrimaryColor',[],validCol);
 
 %=====Scatter Point Data=====
 addParameter(p,'ScatterData',[],@(x) isnumeric(x)&&size(x,2)==3);
@@ -403,6 +407,9 @@ ringorigin=strcmp(validateOrigin(p.Results.PrimaryOrigin),'ring');
 ringoffset=strcmp(validateOrigin(p.Results.PrimaryChromaOffset),'ring');
 rringorigin=strcmp(validateOrigin(p.Results.RefPrimaryOrigin),'ring');
 rringoffset=strcmp(validateOrigin(p.Results.RefPrimaryChromaOffset),'ring');
+vcolsource = p.Results.PrimaryColor;
+if isempty(vcolsource), vcolsource = p.Results.PrimaryColour; end
+usevcol = isempty(vcolsource) || strcmp(vcolsource,'output');
 %loop through all the primaries (RGBCMY) for which indicators are required
 for n=1:max(nprims,nrefprims)
     ri=[];
@@ -415,8 +422,12 @@ for n=1:max(nprims,nrefprims)
         if (~isempty(ri))
             %get the Lab values
             rlab=refgamut.LAB(ri,:);
-            %calculate the nearest sRGB colour
-            rcol=lab2srgb(rlab)/255;
+            if usevcol
+              %calculate the nearest sRGB colour
+              rcol=lab2srgb(rlab)/255;
+            else
+              rcol=prims(n,:);
+            end
             %calculate the hue - may be needed for the origin or a linking arc
             rhue=mod(floor(0.5+atan2(rlab(2),rlab(3))/pi*180)+719,360)+1;
             %calculate the chroma of the outer ring at this hue
