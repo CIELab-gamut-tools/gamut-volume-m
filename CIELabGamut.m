@@ -5,8 +5,9 @@ function gamut = CIELabGamut(varargin)
 %   gamut = CIELabGamut();
 %   gamut = CIELabGamut(filename);
 %   gamut = CIELabGamut(filepath);
-%   gamut = CIELabGamut(filepath, filter);
+%   gamut = CIELabGamut(filepath,filter);
 %   gamut = CIELabGamut(RGB,XYZ,title);
+%   gamut = CIELabGamut(___, 'parameter', value, ...);
 %
 % Input Arguments:
 %   If no arguments are given, the user can browse for a suitable ASCII
@@ -39,6 +40,13 @@ function gamut = CIELabGamut(varargin)
 %  % Initialise data from supplied matrices
 %  gamut = CIELabGamut(RGB, XYZ, 'simulated gamut');    
 %
+% Parameters:
+%   reference       - Specify explicitly the reference white to be used.
+%                     If this is an empty matrix, the R,G,B=max point is
+%                     taken as the white reference, otherwise this must be
+%                     a 3-element vector of the XYZ tristimulous values of
+%                     the white point to use.
+%
 % see also GetVolume, IntersectGamuts, PlotVolume, PlotRings, SyntheticGamut
 
 %import all of the functions in the +CIEtools folder
@@ -50,7 +58,7 @@ end
 % deal with the different input argument variants
 
 p = inputParser;
-addParameter(p, 'reference', [], @isnumeric);
+addParameter(p, 'reference', [], @(x) isempty(x) || isnumeric(x) && numel(x)==3);
 % as there are requirements for additional parameters, add them here
 p.KeepUnmatched = 1;
 
@@ -101,7 +109,7 @@ gamut.RGBmax = max(gamut.RGB(:));
 if (isempty(p.Results.reference))
   gamut.XYZn = gamut.XYZ(all(gamut.RGB==gamut.RGBmax,2),:);
 else
-  gamut.XYZn = p.Results.reference;
+  gamut.XYZn = p.Results.reference(:)';
 end
 
 %Get a D50 white point of equivalent luminance
