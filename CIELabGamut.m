@@ -69,7 +69,7 @@ mainArgs = mod(nargin, 2);
 % next, for any name, value pair, the name must be a char, so skip 2 at a
 % time until the first arg is a char
 while (mainArgs<nargin && ~ischar(varargin{mainArgs+1}))
-  mainArgs = mainArgs+1;
+  mainArgs = mainArgs+2;
 end
 
 % now parse all the rest of the parameters
