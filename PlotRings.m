@@ -423,6 +423,14 @@ switch validatestring(p.Results.RefPrimaries,{'none','rgb','all'})
         nrefprims=6;
 end
 
+if ~isfield(gamut,'RGB')
+  nprims=0;
+end
+
+if ~isempty(refgamut) && ~isfield(refgamut,'RGB')
+  nrefprims=0;
+end
+
 ringorigin=strcmp(validateOrigin(p.Results.PrimaryOrigin),'ring');
 ringoffset=strcmp(validateOrigin(p.Results.PrimaryChromaOffset),'ring');
 rringorigin=strcmp(validateOrigin(p.Results.RefPrimaryOrigin),'ring');
