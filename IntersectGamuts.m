@@ -38,8 +38,8 @@ end
 
 function [c]=intersect(a,b)
     % fix switched pairs of faces
-    a = a(cumsum(a(:,1),'reverse')*2-a(:,1)==1,:);
-    b = b(cumsum(b(:,1),'reverse')*2-b(:,1)==1,:);
+    a = a(cumsum(flip(a(:,1)))*2-a(:,1)==1,:);
+    b = b(cumsum(flip(b(:,1)))*2-b(:,1)==1,:);
     
     sa=size(a,1);
     sb=size(b,1);
