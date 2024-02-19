@@ -71,7 +71,7 @@ for p=2:size(L,1)
         [~,idx] = sort(cm(:,2));
         cm = cm(idx,:);
         % check for a common surface parity error
-        cm = cm(cumsum(flip(cm(:,1)))*2-cm(:,1)==1,:);
+        cm = cm(flip(cumsum(flip(cm(:,1))))*2-cm(:,1)==1,:);
         cylmap{p-1,q-1}=cm;
     end                 
 end
