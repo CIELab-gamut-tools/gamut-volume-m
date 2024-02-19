@@ -53,6 +53,13 @@ Then display this on the plot title:
 title(sprintf('LCD gamut, sRGB coverage = %.0f%%',coverage*100));
 ```
 
+__New Feature!__ Intersection ring plots are now supported.  To git them a go supply the test and reference gamuts to the `PlotRings` function
+with the option `'IntersectionPlot'` set to `true`.  For example:
+```matlab
+  PlotRings(SyntheticGamut('sRGB'),SyntheticGamut('BT.2020'),'IntersectionPlot',true);
+```
+
+
 ## Function reference 
 
 ### `CIELabGamut`
