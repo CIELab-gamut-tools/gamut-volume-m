@@ -69,7 +69,7 @@ mainArgs = mod(nargin, 2);
 % next, for any name, value pair, the name must be a char, so skip 2 at a
 % time until the first arg is a char
 while mainArgs<nargin && (~ischar(varargin{mainArgs+1}) ...
-        || any(any(varargin{mainArgs+1}==['/';':'])))
+        || any(any(varargin{mainArgs+1}==['/';':';'.'])))
   mainArgs = mainArgs+2;
 end
 
@@ -93,7 +93,7 @@ if mainArgs < 3
             [filename,path] = uigetfile(varargin{1},'Please select a CGATS gamut data file');
         end
     elseif mainArgs == 2
-        [filename,path] = uigetfile(fullfile(varargin{:}),'Please select a CGATS gamut data file');
+        [filename,path] = uigetfile(fullfile(varargin{1:2}),'Please select a CGATS gamut data file');
     end
     gamut=readCGATS(fullfile(path,filename));
     gamut.title=filename;
