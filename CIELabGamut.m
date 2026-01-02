@@ -108,7 +108,19 @@ end
 gamut.RGBmax = max(gamut.RGB(:));
 %find the white point
 if (isempty(p.Results.reference))
-  gamut.XYZn = gamut.XYZ(all(gamut.RGB==gamut.RGBmax,2),:);
+  % Check if this is a reflective display (IDMS v1.3)
+  if isfield(gamut, 'display') && strcmp(gamut.display, 'REFLECTIVE')
+    % For reflective displays, white point comes from illumination header
+    i = find(~cellfun('isempty',strfind(gamut.headers,'ILLUMINATION_PERFECT_DIFFUSE_REFLECTOR_XYZ')));
+    if isempty(i)
+      error('Reflective display file missing ILLUMINATION_PERFECT_DIFFUSE_REFLECTOR_XYZ header');
+    end
+    XYZn_str = sscanf(gamut.headers{i(1)},'ILLUMINATION_PERFECT_DIFFUSE_REFLECTOR_XYZ %f %f %f');
+    gamut.XYZn = XYZn_str';
+  else
+    % For emissive displays, white point is XYZ at max RGB
+    gamut.XYZn = gamut.XYZ(all(gamut.RGB==gamut.RGBmax,2),:);
+  end
 else
   gamut.XYZn = p.Results.reference(:)';
 end
