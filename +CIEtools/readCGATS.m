@@ -13,11 +13,11 @@ function cgats = readCGATS(filename, etp)
 %  cgats.display = 'EMISSIVE' or 'REFLECTIVE' (for IDMS files)
 %
 %  expected_type (optional) - For IDMS files, validate against this type
-%    (e.g., 'CGV_MEASUREMENT' or 'CGV_ENVELOPE')
+%    (e.g., 'CGE_MEASUREMENT' or 'CGE_ENVELOPE')
 
 % some constants for IDMS v1.3 support
 VER = 'IDMS_VERSION';
-TPS = {'CGV_MEASUREMENT','CGV_ENVELOPE'};
+TPS = {'CGE_MEASUREMENT','CGE_ENVELOPE'};
 
 %open and read all lines of the file to a cell array
 f = fopen(filename);
@@ -73,7 +73,7 @@ if is_IDMS13
     itp = i(1);
     tp = sscanf(s{itp},'IDMS_FILE_TYPE %s');
     if ~any(strcmp(tp, TPS))
-        error('Error in CGATS file, IDMS_FILE_TYPE should be CGV_MEASUREMENT or CGV_ENVELOPE');
+        error('Error in CGATS file, IDMS_FILE_TYPE should be CGE_MEASUREMENT or CGE_ENVELOPE');
     end
     if nargin>1 && ~strcmp(tp, etp)
         error(['wrong type of file, should be ',etp]);
