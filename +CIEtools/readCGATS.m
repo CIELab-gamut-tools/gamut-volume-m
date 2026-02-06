@@ -8,14 +8,14 @@ function cgats = readCGATS(filename, etp)
 %  There will also be a property named after each format string
 %    which is a column vector of data
 %
-%  For IDMS v1.3 files, additional fields are returned:
-%  cgats.IDMS13 = true/false indicating IDMS v1.3 format
-%  cgats.display = 'EMISSIVE' or 'REFLECTIVE' (for IDMS files)
+%  For IDMS v1.3+ files, additional fields are returned:
+%  cgats.IDMS13 = true/false indicating IDMS v1.3+ format
+%  cgats.display = 'EMISSIVE' or 'REFLECTIVE' (for IDMS v1.3+ files)
 %
 %  expected_type (optional) - For IDMS files, validate against this type
 %    (e.g., 'CGE_MEASUREMENT' or 'CGE_ENVELOPE')
 
-% some constants for IDMS v1.3 support
+% some constants for IDMS v1.3+ support
 VER = 'IDMS_VERSION';
 TPS = {'CGE_MEASUREMENT','CGE_ENVELOPE'};
 
@@ -42,27 +42,26 @@ if isempty(ver) || ~any(ver == 17)
     error('Invalid CGATS version, must be CGATS.17');
 end
 
-% - the format version.  Must equal 2
-i = find(strncmp(s,'FORMAT_VERSION',14));
-if isempty(i)
-    error('Error in CGATS file, missing header FORMAT_VERSION');
-end
-fmt_ver = sscanf(s{i(1)},'FORMAT_VERSION %d');
-if fmt_ver ~= 2
-    error('Error in CGATS file, FORMAT_VERSION should equal 2');
-end
-
-% check if this is a file according to IDMS >v1.3
-is_IDMS13 = any(strncmp(s,VER,12));
-if is_IDMS13
-    % only v1.3 supported by this file
-    i = find(strncmp(s,VER,12));
-    if isempty(i)
-        error('Error in CGATS file, missing header %s', VER);
-    end
+% check for IDMS version header, assume 1.0 if not present
+i = find(strncmp(s,VER,12));
+if ~isempty(i)
     idms_ver = sscanf(s{i(1)},'IDMS_VERSION %f');
-    if idms_ver ~= 1.3
-        error('Error in CGATS file, IDMS_VERSION should equal 1.3');
+else
+    idms_ver = 1.0;
+end
+is_IDMS13 = idms_ver >= 1.3;
+
+if is_IDMS13
+    % IDMS v1.3+ files have additional mandatory headers
+
+    % - the format version.  Must equal 2
+    i = find(strncmp(s,'FORMAT_VERSION',14));
+    if isempty(i)
+        error('Error in CGATS file, missing header FORMAT_VERSION');
+    end
+    fmt_ver = sscanf(s{i(1)},'FORMAT_VERSION %d');
+    if fmt_ver ~= 2
+        error('Error in CGATS file, FORMAT_VERSION should equal 2');
     end
 
     % must have a file type that matches requirements
@@ -89,7 +88,7 @@ if is_IDMS13
         error('Error in CGATS file, CGV_DISPLAY_TYPE should be EMISSIVE or REFLECTIVE');
     end
 else
-    % for IDMS <v1.3, only emissive is supported
+    % for IDMS versions < 1.3 (or no IDMS_VERSION header), only emissive is supported
     d_tp = 'EMISSIVE';
     itp=0;
 end
