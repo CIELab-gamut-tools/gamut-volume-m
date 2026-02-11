@@ -266,15 +266,17 @@ end
 %calculate the main set of gamut rings
 lrings = p.Results.LRings;
 if intersectionPlot
-  rings = ringsBase(testGamut,lrings, refgamut);
+  rings = calcGamutRings(refgamut, lrings);
   [testX, testY, testVol] = calcSubRings(rings, testGamut);
   [refX, refY, refVol] = calcSubRings(rings, refgamut);
 else
-  rings = ringsBase(testGamut,lrings);
+  rings = calcGamutRings(testGamut, lrings);
   testX = rings.x(2:end,:);
   testY = rings.y(2:end,:);
   if ~isempty(refgamut)
-      [refX,refY] = calcRings(refgamut,[]);
+      refRings = calcGamutRings(refgamut, []);
+      refX = refRings.x(2:end,:);
+      refY = refRings.y(2:end,:);
   end
   testVol = rings.vol;
   if validGamut(refgamut), refVol = GetVolume(refgamut); end
@@ -395,13 +397,13 @@ end
 % ================== Reference rings ===================== %
 %if a reference is supplied, add just the L*=100 line
 if ~isempty(refgamut) && ~intersectionPlot
-    [xref,yref] = calcRings(refgamut,[]);
-    plot(xref(end,[1:end 1]),yref(end,[1:end 1]),p.Results.RefLine);
+    refRings1 = calcGamutRings(refgamut, []);
+    plot(refRings1.x(end,[1:end 1]),refRings1.y(end,[1:end 1]),p.Results.RefLine);
 end
 %if a second reference is supplied, add just the L*=100 line
 if ~isempty(refgamut2) && strcmp(ringRef,'none')
-    [xref2,yref2] = calcRings(refgamut2,[]);
-    plot(xref2(end,[1:end 1]),yref2(end,[1:end 1]),p.Results.Ref2Line);
+    refRings2 = calcGamutRings(refgamut2, []);
+    plot(refRings2.x(end,[1:end 1]),refRings2.y(end,[1:end 1]),p.Results.Ref2Line);
 end
 
 % ================== Primary Colour Indicators ===================== %
@@ -570,54 +572,10 @@ end
 hold off;
 end
 
-function [x,y,rings,vol]=calcRings(gamut,LRings)
-    dH=2*pi/gamut.hsteps;
-    dL=100/gamut.Lsteps;
-    %get the map of the volume in cylintrical coordinates
-    volmap=cellfun(@(a) sum(a(:,1).*(a(:,2).^2)*dL*dH/2),gamut.cylmap);
-    %Get the accumulated volume sum (the final row will be the total)
-    %and calculate the radius required to represent that volume
-    %adding a zero radius at the start
-    rings=interp1([0 1:100/gamut.Lsteps:100],[zeros(1,gamut.hsteps);(2*cumsum(volmap)/dH).^0.5],[0 LRings 100]);
-    %Plot against the mid-point of the angle ranges
-    midH=dH/2:dH:2*pi;
-    x=repmat(sin(midH),numel(LRings)+2,1).*rings;
-    y=repmat(cos(midH),numel(LRings)+2,1).*rings;
-    vol=sum(volmap(:));
-end
-
 function noLegend(h)
     if (~isempty(h))
         set(h,'HandleVisibility','off');
     end
-end
-
-function [rings] = ringsBase(gamut, LRings, ref)
-     dH=2*pi/gamut.hsteps;
-     dL=100/gamut.Lsteps;
-     %get the map of the volume in cylintrical coordinates
-     volmapFn = @(a) sum(a(:,1).*(a(:,2).^2)*dL*dH/2);
-     if (nargin > 2)
-       volmap=cellfun(volmapFn,ref.cylmap);
-     else
-       volmap=cellfun(volmapFn,gamut.cylmap);
-     end
-     %Get the accumulated volume sum (the final row will be the total)
-     %and calculate the radius required to represent that volume
-     %adding a zero radius at the start
-     r2=interp1([0 1:100/gamut.Lsteps:100],[zeros(1,gamut.hsteps);(2*cumsum(volmap)/dH)],[0 LRings 100]);
-     rings = struct();
-     rings.r2 = r2;
-     rings.midH=dH/2:dH:2*pi;
-     rings.dH=dH;
-     rings.dL=dL;
-     rings.LRings=LRings;
-     rings.ux=sin(rings.midH);
-     rings.uy=cos(rings.midH);
-     r=sqrt(r2);
-     rings.x=r.*rings.ux;
-     rings.y=r.*rings.uy;
-     rings.vol=sum(volmap(:));
 end
 
 function [x,y,vol] = calcSubRings(rings, gamut)

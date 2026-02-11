@@ -78,7 +78,7 @@ assert(inter.hsteps == srgb.hsteps);
 srgb = SyntheticGamut('sRGB', 'Name', 'sRGB');
 bt2020 = SyntheticGamut('BT.2020', 'Name', 'BT2020');
 inter = IntersectGamuts(srgb, bt2020);
-assert(contains(inter.title, 'sRGB') || contains(inter.title, 'BT2020'), ...
+assert(~isempty(strfind(inter.title, 'sRGB')) || ~isempty(strfind(inter.title, 'BT2020')), ...
     'Intersection title should reference source gamuts');
 
 %% Triple intersection works

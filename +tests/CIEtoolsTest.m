@@ -73,7 +73,7 @@ assert(all(p==pr));
 assert(~isempty(which('readCGATS')));
 
 %% read the sRGB.tst test file and check the correct fields are present
-cgats=readCGATS('samples\sRGB.txt');
+cgats=readCGATS('samples/sRGB.txt');
 assert(all(isfield(cgats,{'RGB','XYZ','filename'})));
 assert(all(size(cgats.RGB)==[602,3]));
 assert(all(size(cgats.XYZ)==[602,3]));

@@ -64,7 +64,7 @@ end
 
 %% Filename is stored correctly
 cgats = readCGATS('samples/sRGB.txt');
-assert(contains(cgats.filename, 'sRGB.txt'), 'Filename should be stored');
+assert(~isempty(strfind(cgats.filename, 'sRGB.txt')), 'Filename should be stored');
 
 %% Sample ID column is parsed
 cgats = readCGATS('samples/sRGB.txt');
@@ -81,6 +81,6 @@ try
     assert(false, 'Should throw error for wrong file type');
 catch ME
     % Expected - wrong file type
-    assert(contains(ME.message, 'wrong type') || contains(ME.message, 'CGE_ENVELOPE'), ...
+    assert(~isempty(strfind(ME.message, 'wrong type')) || ~isempty(strfind(ME.message, 'CGE_ENVELOPE')), ...
         'Error message should mention wrong type');
 end
