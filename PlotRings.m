@@ -20,7 +20,7 @@ function PlotRings(gamut, varargin)
 %   % The same figure showing the difference in the primary colours
 %   figure;
 %   PlotRings(gamut, sRGB,... 
-%     'LLabelIndices',[], ... %Turn of the label indices
+%     'LLabelIndices',[], ... %Turn off the label indices
 %     'RingReference','intersection', ... %Show, per ring, the intersection
 %     'ChromaRing',1000, ... %Show a ring of constant chroma
 %     'Primaries','all', ... %Show all primaries - RGBCMY
@@ -72,6 +72,10 @@ function PlotRings(gamut, varargin)
 %                       the intersection plot is shown, this is
 %                       automatically true.
 %                       [true | false (default)]
+%
+%   RingReference     - Specifies how the reference gamut is shown on each
+%                       ring when a reference is provided.
+%                       ['none' (default) | 'intersection' | 'ref']
 %
 % +Gamut Bands
 %   ShowBands         - The Bands are the coloured sections between the

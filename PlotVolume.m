@@ -1,5 +1,5 @@
 function h=PlotVolume(gamut,alpha)
-%PLOTVOLUME plot a 3D CIELab gamut volume
+%PlotVolume plot a 3D CIELab gamut volume
 %
 % Syntax:
 %   h = PlotVolume(gamut)

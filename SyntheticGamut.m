@@ -13,7 +13,7 @@ function [gamut] = SyntheticGamut(varargin)
 %
 % Input Arguments:
 %   referenceName is a string or char array, and one of 'sRGB', 'DCI-P3',
-%     'BT.2020'.
+%     'BT.2020', 'D65-P3', or 'D60-P3'.
 %
 %   RGBxy is a 3x2 matrix of CIE1931 x,y chromaticities in the row order
 %     red, green then blue.
@@ -90,7 +90,7 @@ function [gamut] = SyntheticGamut(varargin)
 %                       then be 6*steps^2+2.
 %                       [10 | integer > 0]
 %
-%   Name              - The name of the gamut.  Can be used in subsiquent
+%   Name              - The name of the gamut.  Can be used in subsequent
 %                       plots.
 %                       ['Synthetic Gamut' or ref name | char | string]
 %

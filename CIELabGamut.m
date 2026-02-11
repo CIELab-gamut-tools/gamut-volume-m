@@ -29,6 +29,8 @@ function gamut = CIELabGamut(varargin)
 % Returned Values:
 %  gamut is a structure containing the gamut data which can be used by any
 %  of the other analysis functions, such as GetVolume or PlotRings.
+%  The structure includes XYZ_raw, the original XYZ data before chromatic
+%  adaptation to D50.
 %
 % Examples:
 %  % Browse for a file
@@ -43,9 +45,11 @@ function gamut = CIELabGamut(varargin)
 % Parameters:
 %   reference       - Specify explicitly the reference white to be used.
 %                     If this is an empty matrix, the R,G,B=max point is
-%                     taken as the white reference, otherwise this must be
-%                     a 3-element vector of the XYZ tristimulous values of
-%                     the white point to use.
+%                     taken as the white reference for emissive displays.
+%                     For reflective displays (IDMS v1.3 format), the white
+%                     point is read from the ILLUMINATION_PERFECT_DIFFUSE_REFLECTOR_XYZ
+%                     header. Otherwise this must be a 3-element vector of
+%                     the XYZ tristimulus values of the white point to use.
 %
 % see also GetVolume, IntersectGamuts, PlotVolume, PlotRings, SyntheticGamut
 

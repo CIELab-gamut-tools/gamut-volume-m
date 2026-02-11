@@ -10,7 +10,7 @@ function [gamut] = IntersectGamuts(g1,g2)
 %
 % Returned values:
 %   gamut is a gamut object which can be used by PlotRings, GetVolume and
-%   futher calls to this function, however this gamut does not include a
+%   further calls to this function, however this gamut does not include a
 %   surface tesselation so it cannot be used with PlotVolume
 %
 % Examples:
@@ -20,9 +20,9 @@ function [gamut] = IntersectGamuts(g1,g2)
 %   % calculate the intersection
 %   igamut = IntersectGamuts(gamut,ref);
 %   % display the intersected gamut volume
-%   fprints('sRGB gamut volume = %g\n',GetVolume(igamut));
+%   fprintf('sRGB gamut volume = %g\n',GetVolume(igamut));
 %
-% See also CIELabGamut, PlotRings, GetVolume, SyntheticGamut
+% See also CIELabGamut, PlotRings, PlotVolume, GetVolume, SyntheticGamut
 
 if (g1.Lsteps~=g2.Lsteps || g1.hsteps~=g2.hsteps)
     error('The gamut cylindrical mappings must match');

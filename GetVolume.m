@@ -15,7 +15,7 @@ function vol = GetVolume(gamut)
 %   % Create reference gamut data
 %   gamut = SyntheticGamut('BT.2020');
 %   % display the gamut volume
-%   fprints('BT.2020 gamut volume = %g\n',GetVolume(gamut));
+%   fprintf('BT.2020 gamut volume = %g\n',GetVolume(gamut));
 %
 % See also CIELabGamut, SyntheticGamut, IntersectGamuts, PlotRings, PlotVolume
 
