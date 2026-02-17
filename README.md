@@ -52,11 +52,14 @@ Full documentation is available in the [`docs/`](docs/index.md) folder:
 - [CGATS File Format](docs/guides/cgats-file-format.md)
 
 ## Testing
-
+In Matlab:
 ```matlab
 runtests('tests');
 ```
-
+Or there is a cross-platform test runner for Octave or Matlab:
+```octave
+run_tests;
+```
 ## License
 
 See [LICENSE](LICENSE) for details.
