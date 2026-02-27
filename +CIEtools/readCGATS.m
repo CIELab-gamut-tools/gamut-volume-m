@@ -131,7 +131,7 @@ flds = [fmt; mat2cell(data,N,ones(1,M))];
 
 %check for format strings of the form ABC_A, e.g. RGB_R
 %if present, combine them into ABC properties
-i=cellfun(@(s) ~isempty(regexp(s,'[A-Z]{3}_[A-Z]','ONCE')),fmt);
+i=cellfun(@(s) ~isempty(regexp(s,'^[A-Z]{3}_[A-Z]$','ONCE')),fmt);
 keys=cell2mat(fmt(i)');
 umkeys=unique(keys(:,1:3),'rows');
 K=size(umkeys,1);
